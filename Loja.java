@@ -1,6 +1,4 @@
-import java.util.Random;
-
-public class Loja {
+public class Loja extends Enumerate.raridadedascartas {
     private String numeroCartao;
     private String codigoVerificador;
     private boolean promocao;
@@ -9,6 +7,13 @@ public class Loja {
         this.numeroCartao = numeroCartao;
         this.codigoVerificador = codigoVerificador;
         this.promocao = false; // A promoção começa como falsa por padrão.
+    }
+
+    public Loja(String numeroCartao, String codigoVerificador, raridadedascartas raridade) {
+        super(raridade.name, raridade.dropProbability);
+        this.numeroCartao = numeroCartao;
+        this.codigoVerificador = codigoVerificador;
+        this.promocao = false;
     }
 
     public String getNumeroCartao() {
@@ -39,19 +44,14 @@ public class Loja {
     }
 
     public void compraBoosterEspecial(Inventario inventario) {
-        int custoBoosterEspecial = 1.5 * 120;
+        int custoBoosterEspecial = (int)(1.5 * 120); // Custo do booster especial
 
         if (inventario.getCardcoins() >= custoBoosterEspecial) {
             inventario.setCardcoins(inventario.getCardcoins() - custoBoosterEspecial);
-            if (promocao) {
-                if (gerarNumeroAleatorio(1, 100) <= 1) {
-                    Carta cartaUnica = gerarCartaUnica();
-                    inventario.adicionarCarta(cartaUnica);
-                } else {
-                    adicionarCartasAleatoriasAoInventario(inventario);
-                }
-            } else {
-                adicionarCartasAleatoriasAoInventario(inventario);
+            
+            for (int i = 0; i < 12; i++) {
+                Carta cartaAleatoria = gerarCartaComRaridadeAleatoria();
+                inventario.adicionarCarta(cartaAleatoria);
             }
         } else {
             System.out.println("Saldo insuficiente de cardcoins para o booster especial.");
@@ -81,6 +81,12 @@ public class Loja {
         return new Carta(nomeCartaAleatoria);
     }
 
+    private Carta gerarCartaComRaridadeAleatoria() {
+        Enumerate.raridadedascartas raridade = Enumerate.raridadedascartas.getRandomRarity();
+        String nomeCartaAleatoria = "Carta" + raridade.getName();
+        return new Carta(nomeCartaAleatoria);
+    }
+
     private int gerarNumeroAleatorio(int min, int max) {
         Random random = new Random();
         return random.nextInt(max - min + 1) + min;
@@ -90,4 +96,6 @@ public class Loja {
         String nomeCartaUnica = "CartaUnica";
         return new Carta(nomeCartaUnica);
     }
+}
+
 }
